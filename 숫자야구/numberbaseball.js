@@ -1,9 +1,11 @@
+//숫자야구 게임
 var 바디 = document.body;
 var 숫자후보;
 var 숫자배열;
 
 function 숫자뽑기() {
   숫자후보 = [1,2,3,4,5,6,7,8,9];
+  //숫자후보에서 뽑은 랜덤 숫자4개를 배열에 넣는다.
   숫자배열 = [];
   for (var i = 0; i < 4; i += 1) {
       //push - 마지막에 추가
@@ -32,7 +34,7 @@ var 버튼 = document.createElement('button');
 폼.append(버튼);
 
 var 틀린횟수 = 0;
-폼.addEventListener('submit', function event(이벤트) { // 엔터를 쳤을 때
+폼.addEventListener('submit', function event(이벤트) { // 비동기 이벤트는 동기이벤트랑 다른 순서로 실행된다.
   이벤트.preventDefault();
   var 답 = 입력창.value;
   if (답 === 숫자배열.join('')) { // 답이 맞으면
@@ -41,7 +43,8 @@ var 틀린횟수 = 0;
     입력창.focus();
     숫자뽑기();
     틀린횟수 = 0;
-  } else { // 답이 틀리면
+  } 
+  else { // 답이 틀리면
     var 답배열 = 답.split('');
     var 스트라이크 = 0;
     var 볼 = 0;
@@ -51,14 +54,17 @@ var 틀린횟수 = 0;
       입력창.value = '';
       입력창.focus();
       숫자뽑기();
-      틀린횟수 = 0;
-    } else { // 10번 미만으로 틀린 경우
+      틀린횟수 = 0; //0으로 다시 초기화
+     
+    } 
+    else { // 10번 미만으로 틀린 경우
       console.log('답이 틀리면', 답배열);
       for (var i = 0; i <= 3; i += 1) {
         if (Number(답배열[i]) === 숫자배열[i]) { // 같은 자리인지 확인
           console.log('같은 자리?');
           스트라이크 += 1;
         } else if (숫자배열.indexOf(Number(답배열[i])) > -1) { // 같은 자리는 아니지만, 숫자가 겹치는지 확인
+          //indexOf는 배열위치를 알려준다.
           console.log('겹치는 숫자?');
           볼 += 1;
         }
