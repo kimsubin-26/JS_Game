@@ -1,12 +1,12 @@
 var 테이블 =document.getElementById('table');
 var 데이터 = [];
+var 점수표 =document.getElementById('score');
 
 function 초기화(){
   var fragment = document.createDocumentFragment();
     
   [1, 2, 3, 4].forEach(function() {
     var 열데이터 = [];
-      
     데이터.push(열데이터);
     var tr = document.createElement('tr');
     [1, 2, 3, 4].forEach(function() {
@@ -28,10 +28,17 @@ function 랜덤생성(){
             }
         });
     });
-    console.log(빈칸배열);
-    var 랜덤칸 = 빈칸배열[Math.floor(Math.random()*빈칸배열.length)];
+    if(빈칸배열.length ===0){
+        alert('게임오버: ' + 점수표.textContent);
+        테이블.innerHTML = '';
+        초기화();
+    }
+    else{
+        var 랜덤칸 = 빈칸배열[Math.floor(Math.random()*빈칸배열.length)];
     데이터[랜덤칸[0]][랜덤칸[1]] = 2;
     그리기();
+    }
+    
 }
 
 function 그리기() {
@@ -39,7 +46,8 @@ function 그리기() {
     열데이터.forEach(function(행데이터, j) {
       if (행데이터 > 0) {
         테이블.children[i].children[j].textContent = 행데이터;
-      } else {
+      }
+        else {
         테이블.children[i].children[j].textContent = '';
       }
     });
@@ -81,23 +89,19 @@ window.addEventListener('mousemove', function(이벤트){
     }
 });
 window.addEventListener('mouseup', function(이벤트){
-    드래그시작 = false;
+   
     끝좌표 = [이벤트.clientX, 이벤트.clientY];
     
     if(드래그중){
     //방향 판단 2차평면에서 45도를 그었을경우 위 아래 오른쪽 아래쪽 각도와 기울기로 판단.
-    /*
-      기울기 공식 -> y = ax+b 인데 a가 기울기 역할을 한다
-      기울기는 y증가량분의 x증가량이기에
-      이 a를 구하는 공식은 y2-y1/x2-x1이다
-      
-      */
+        
+        //중심이 (0,0)일때 마지막좌표의 차이를 뺄경우 x좌표가 음수인지 아닌지로 왼쪽 오른쪽
+        //중심이(0,0)과 마지막표 차이를 뺄경우 y좌표로 음수이면 위, 양수이면 아래인걸 알수 있다 이걸로 차이를 본다.
+        //math.abs 절대값 함수
     var 방향;
     var x차이 = 끝좌표[0] - 시작좌표[0];
     var y차이 = 끝좌표[1] - 시작좌표[1];
-      
-    //Math.abs() 함수 abs()함수는 인자값에 대한 절대값을 반환하는 함수입니다.
-     //Math는 클래스의 함수중 하나로 static 함수입니다.
+        
     if ( x차이 <0 && Math.abs(x차이) / Math.abs(y차이)>1){
         방향 = '왼쪽';
     }
@@ -112,10 +116,149 @@ window.addEventListener('mouseup', function(이벤트){
     }
     console.log(x차이, y차이, 방향);
     }
+    
     드래그시작 =false;
     드래그중 = false;
+    
+    
+    switch(방향){
+        case '왼쪽':
+           var 새데이터 =[
+                [],
+                [],
+                [],
+                []
+            ];
+            데이터.forEach(function(열데이터, i) {
+            열데이터.forEach(function(행데이터, j) {
+          if (행데이터) {
+            if (새데이터[i][새데이터[i].length - 1] && 새데이터[i][새데이터[i].length - 1] === 행데이터) {
+              새데이터[i][새데이터[i].length - 1] *= 2;
+              var 현점수 = parseInt(점수표.textContent, 10);
+              점수표.textContent = 현점수 + 새데이터[i][새데이터[i].length - 1];
+            } 
+            else {
+              새데이터[i].push(행데이터);
+                 }
+            }
+                });
+            });
+          
+            console.log(새데이터);
+            [1,2,3,4].forEach(function(열데이터, i){
+            [1,2,3,4].forEach(function(행데이터, j){
+                 데이터[i][j] = 새데이터[i][j] || 0;
+                    
+                });
+            });
+            break;
+            
+        case '오른쪽' :
+           var 새데이터 =[
+                [],
+                [],
+                [],
+                []
+            ];
+            데이터.forEach(function(열데이터, i){
+            열데이터.forEach(function(행데이터, j){
+                if(행데이터){
+                    
+                if (새데이터[i][0] && 새데이터[i][0] === 행데이터) {
+              새데이터[i][0] *= 2;
+              var 현점수 = parseInt(점수표.textContent, 10);
+              점수표.textContent = 현점수 + 새데이터[i][0];
+            } 
+            else {
+              새데이터[i].unshift(행데이터);
+                 }
+                  
+                }
+                });
+            });
+            console.log(새데이터);
+            [1,2,3,4].forEach(function(열데이터, i){
+            [1,2,3,4].forEach(function(행데이터, j){
+                 데이터[i][3-j] = 새데이터[i][j] || 0;
+                    
+                });
+            });
+            break;
+            
+        case '위' :
+         /*
+    
+        숫자 6개가 랜덤으로 만들어지면 배열 4개를 만들어두면 반복문을 돌면서 2있으면 배열1번에 넣고 4가 나오면 다른곳에 넣고 순차적으로 반복문을 돌면서 배열에 넣고 새데이터를 반복문을 돌아서 첫번째 칸에 천천히 아래로 쓰는걸로 통해서 위로 올려주는 효과를 준다.
+        */
+            var 새데이터 =[
+                [],
+                [],
+                [],
+                []
+            ];
+            데이터.forEach(function(열데이터, i){
+            열데이터.forEach(function(행데이터, j){
+                if(행데이터){
+                    //행데이터가 내 데이터 새데이터[i][새데이터[i].length-1] = 나보다 전에 들어있던 데이터 나보다 먼저 위에 있던 데이터랑 같으면 합치고 아니면 푸쉬만 하는거.
+                  
+                    if (새데이터[j][새데이터[j].length-1] && 새데이터[j][새데이터[j].length-1] === 행데이터) {
+              새데이터[j][새데이터[j].length-1] *= 2;
+              var 현점수 = parseInt(점수표.textContent, 10);
+              점수표.textContent = 현점수 +새데이터[j][새데이터[j].length-1];
+            } 
+            else {
+                 새데이터[j].push(행데이터);
+                 }
+                  
+                
+                
+                   }
+                });
+            });
+            console.log(새데이터);
+            [1,2,3,4].forEach(function(행데이터, i){
+            [1,2,3,4].forEach(function(열데이터, j){
+                 데이터[j][i] = 새데이터[i][j] || 0;
+                    
+                });
+            });
+            break;
+        case '아래' :
+            var 새데이터 =[
+                [],
+                [],
+                [],
+                []
+            ];
+            데이터.forEach(function(열데이터, i){
+            열데이터.forEach(function(행데이터, j){
+                if(행데이터){
+                    if (새데이터[j][0] && 새데이터[j][0] === 행데이터) {
+              새데이터[j][0] *= 2;
+              var 현점수 = parseInt(점수표.textContent, 10);
+              점수표.textContent = 현점수 +새데이터[j][0];
+            } 
+            else {
+                새데이터[j].unshift(행데이터);
+                 }
+                  
+                   
+                   }
+                });
+            });
+            console.log(새데이터);
+            [1,2,3,4].forEach(function(행데이터, i){
+            [1,2,3,4].forEach(function(열데이터, j){
+                 데이터[3-j][i] = 새데이터[i][j] || 0;
+                    
+                });
+            });
+            break;
+        
+    } 
+    그리기();
+    랜덤생성();
 });
-
 
 
 
